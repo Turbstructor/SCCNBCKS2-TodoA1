@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -36,6 +37,12 @@ class TaskController(
     fun readTask(@PathVariable taskId: Long): ResponseEntity<TaskResponse> =
         ResponseEntity.status(HttpStatus.OK)
             .body(taskService.readTask(taskId))
+
+
+    @PatchMapping("/{taskId}")
+    fun toggleTaskCompletion(@PathVariable taskId: Long): ResponseEntity<Unit> =
+        ResponseEntity.status(HttpStatus.NO_CONTENT)
+            .body(taskService.toggleTaskCompletion(taskId))
 
 
     @PutMapping("/{taskId}")

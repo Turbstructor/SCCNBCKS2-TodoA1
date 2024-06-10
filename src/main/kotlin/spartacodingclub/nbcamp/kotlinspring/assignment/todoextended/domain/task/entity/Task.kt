@@ -25,6 +25,9 @@ class Task(
     @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
     var id: Long? = null
 
+    @Column(name = "is_done", nullable = false)
+    var isDone: Boolean = false
+
     @Column(name = "created_at")
     val createdAt: ZonedDateTime = LocalDateTime.now().atZone(ZoneId.of("UTC"))
 
@@ -33,6 +36,10 @@ class Task(
 
 
     companion object
+
+    fun toggleCompletion() {
+        isDone = !isDone
+    }
 }
 
 fun Task.Companion.from(request: CreateTaskRequest) = Task(request.title, request.content, request.author)
@@ -49,6 +56,7 @@ fun Task.toResponse() = TaskResponse(
     id = id!!,
     title = title,
     content = content,
+    isDone = isDone,
     author = author,
     createdAt = createdAt,
     updatedAt = updatedAt

@@ -6,6 +6,7 @@ data class TaskResponse(
     val id: Long,
     val title: String,
     val content: String,
+    val isDone: Boolean,
     val author: String,
     val createdAt: ZonedDateTime,
     val updatedAt: ZonedDateTime

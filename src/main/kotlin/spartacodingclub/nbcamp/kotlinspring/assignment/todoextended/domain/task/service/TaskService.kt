@@ -30,6 +30,16 @@ class TaskService(
             ?: throw IllegalArgumentException("Target Task not found")
 
 
+    fun toggleTaskCompletion(taskId: Long) {
+        val targetTask = taskRepository.findByIdOrNull(taskId)
+            ?: throw IllegalArgumentException("Target Task not found")
+
+        targetTask.toggleCompletion()
+
+        taskRepository.save(targetTask)
+    }
+
+
     fun updateTask(taskId: Long, request: UpdateTaskRequest): TaskResponse {
         val targetTask = taskRepository.findByIdOrNull(taskId)
             ?: throw IllegalArgumentException("Target Task not found")
@@ -40,9 +50,12 @@ class TaskService(
     }
 
 
-    fun deleteTask(taskId: Long) =
-        taskRepository.delete(taskRepository.findByIdOrNull(taskId)
-            ?: throw IllegalArgumentException("Target Task not found"))
+    fun deleteTask(taskId: Long) {
+        taskRepository.delete(
+            taskRepository.findByIdOrNull(taskId)
+                ?: throw IllegalArgumentException("Target Task not found")
+        )
+    }
 
 
 }
