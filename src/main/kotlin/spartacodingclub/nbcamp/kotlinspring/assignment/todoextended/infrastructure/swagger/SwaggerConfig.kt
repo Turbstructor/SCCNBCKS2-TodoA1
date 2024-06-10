@@ -16,6 +16,6 @@ class SwaggerConfig {
             Info()
                 .title("Todo-Extended API")
                 .description("Todo-Extended API Schema")
-                .version("1.0.0")
+                .version("2.0.0")
         )
 }

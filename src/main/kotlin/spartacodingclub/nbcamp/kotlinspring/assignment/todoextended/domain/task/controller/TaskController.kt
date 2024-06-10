@@ -4,6 +4,7 @@ import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
+import org.springframework.web.bind.annotation.PatchMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.PutMapping
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.request.CreateTaskRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.request.UpdateTaskRequest
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.response.TaskDetailedResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.response.TaskResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.service.TaskService
 
@@ -33,9 +35,15 @@ class TaskController(
             .body(taskService.readAllTasks())
 
     @GetMapping("/{taskId}")
-    fun readTask(@PathVariable taskId: Long): ResponseEntity<TaskResponse> =
+    fun readTask(@PathVariable taskId: Long): ResponseEntity<TaskDetailedResponse> =
         ResponseEntity.status(HttpStatus.OK)
             .body(taskService.readTask(taskId))
+
+
+    @PatchMapping("/{taskId}")
+    fun toggleTaskCompletion(@PathVariable taskId: Long): ResponseEntity<Unit> =
+        ResponseEntity.status(HttpStatus.NO_CONTENT)
+            .body(taskService.toggleTaskCompletion(taskId))
 
 
     @PutMapping("/{taskId}")
