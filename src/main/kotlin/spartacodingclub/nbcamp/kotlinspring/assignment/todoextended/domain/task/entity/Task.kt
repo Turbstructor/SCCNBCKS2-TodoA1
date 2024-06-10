@@ -1,8 +1,11 @@
 package spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.entity
 
 import jakarta.persistence.*
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.entity.Comment
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.entity.toResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.request.CreateTaskRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.request.UpdateTaskRequest
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.response.TaskDetailedResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.response.TaskResponse
 import java.time.LocalDateTime
 import java.time.ZoneId
@@ -60,4 +63,9 @@ fun Task.toResponse() = TaskResponse(
     author = author,
     createdAt = createdAt,
     updatedAt = updatedAt
+)
+
+fun Task.toDetailedResponse(comments: List<Comment>) = TaskDetailedResponse(
+    task = this.toResponse(),
+    comments = comments.map { it.toResponse() }
 )

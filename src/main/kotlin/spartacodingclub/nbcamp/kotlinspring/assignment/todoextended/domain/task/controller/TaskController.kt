@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.request.CreateTaskRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.request.UpdateTaskRequest
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.response.TaskDetailedResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.response.TaskResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.service.TaskService
 
@@ -34,7 +35,7 @@ class TaskController(
             .body(taskService.readAllTasks())
 
     @GetMapping("/{taskId}")
-    fun readTask(@PathVariable taskId: Long): ResponseEntity<TaskResponse> =
+    fun readTask(@PathVariable taskId: Long): ResponseEntity<TaskDetailedResponse> =
         ResponseEntity.status(HttpStatus.OK)
             .body(taskService.readTask(taskId))
 

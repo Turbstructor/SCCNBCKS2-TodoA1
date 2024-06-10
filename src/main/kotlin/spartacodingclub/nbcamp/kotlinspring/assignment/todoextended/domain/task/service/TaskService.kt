@@ -1,23 +1,17 @@
 package spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.service
 
-import org.hibernate.sql.Update
 import org.springframework.data.repository.findByIdOrNull
 import org.springframework.stereotype.Service
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.dto.request.CreateCommentRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.dto.request.UpdateCommentRequest
-import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.dto.response.CommentResponse
-import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.entity.Comment
-import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.entity.from
-import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.entity.toResponse
-import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.entity.updateFrom
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.dto.response.CommentDetailedResponse
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.entity.*
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.repository.CommentRepository
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.request.CreateTaskRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.request.UpdateTaskRequest
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.response.TaskDetailedResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.dto.response.TaskResponse
-import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.entity.Task
-import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.entity.from
-import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.entity.toResponse
-import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.entity.updateFrom
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.entity.*
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.repository.TaskRepository
 
 @Service
@@ -37,8 +31,9 @@ class TaskService(
             .sortedByDescending { it.createdAt }
             .map { it.toResponse() }
 
-    fun readTask(taskId: Long): TaskResponse =
-        taskRepository.findByIdOrNull(taskId)?.toResponse()
+    fun readTask(taskId: Long): TaskDetailedResponse =
+        taskRepository.findByIdOrNull(taskId)?.
+        toDetailedResponse(commentRepository.findAllByTaskId(taskId))
             ?: throw IllegalArgumentException("Target Task not found")
 
 
@@ -73,19 +68,19 @@ class TaskService(
 
     // Comments
 
-    fun createComment(taskId: Long, request: CreateCommentRequest): CommentResponse =
+    fun createComment(taskId: Long, request: CreateCommentRequest): CommentDetailedResponse =
         taskRepository.findByIdOrNull(taskId)?.let { targetTask ->
-            commentRepository.save(Comment.from(targetTask, request)).toResponse()
+            commentRepository.save(Comment.from(targetTask, request)).toDetailedResponse()
         } ?: throw IllegalArgumentException("Target Task not found")
 
 
-    fun updateComment(taskId: Long, commentId: Long, request: UpdateCommentRequest): CommentResponse {
+    fun updateComment(taskId: Long, commentId: Long, request: UpdateCommentRequest): CommentDetailedResponse {
         val targetComment = commentRepository.findByTaskIdAndId(taskId, commentId)
             ?: throw IllegalArgumentException("Target Comment not found")
 
         targetComment.updateFrom(request)
 
-        return commentRepository.save(targetComment).toResponse()
+        return commentRepository.save(targetComment).toDetailedResponse()
     }
 
 

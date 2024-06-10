@@ -11,7 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.dto.request.CreateCommentRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.dto.request.UpdateCommentRequest
-import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.dto.response.CommentResponse
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.dto.response.CommentDetailedResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.service.TaskService
 
 @RestController
@@ -21,13 +21,13 @@ class CommentController(
 ) {
 
     @PostMapping
-    fun createComment(@PathVariable taskId: Long, @RequestBody request: CreateCommentRequest): ResponseEntity<CommentResponse> =
+    fun createComment(@PathVariable taskId: Long, @RequestBody request: CreateCommentRequest): ResponseEntity<CommentDetailedResponse> =
         ResponseEntity.status(HttpStatus.CREATED)
             .body(taskService.createComment(taskId, request))
 
 
     @PutMapping("/{commentId}")
-    fun updateCOmment(@PathVariable taskId: Long, @PathVariable commentId: Long, @RequestBody request: UpdateCommentRequest): ResponseEntity<CommentResponse> =
+    fun updateCOmment(@PathVariable taskId: Long, @PathVariable commentId: Long, @RequestBody request: UpdateCommentRequest): ResponseEntity<CommentDetailedResponse> =
         ResponseEntity.status(HttpStatus.OK)
             .body(taskService.updateComment(taskId, commentId, request))
 

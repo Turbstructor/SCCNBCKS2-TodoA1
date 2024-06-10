@@ -10,6 +10,7 @@ import jakarta.persistence.ManyToOne
 import jakarta.persistence.Table
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.dto.request.CreateCommentRequest
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.dto.request.UpdateCommentRequest
+import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.dto.response.CommentDetailedResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.domain.comment.dto.response.CommentResponse
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.entity.Task
 import spartacodingclub.nbcamp.kotlinspring.assignment.todoextended.domain.task.entity.toResponse
@@ -63,5 +64,9 @@ fun Comment.toResponse() = CommentResponse(
     author = author,
     createdAt = createdAt,
     updatedAt = updatedAt,
+)
+
+fun Comment.toDetailedResponse() = CommentDetailedResponse(
+    comment = this.toResponse(),
     taskRelated = task.toResponse()
 )
