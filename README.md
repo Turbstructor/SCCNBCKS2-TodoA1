@@ -45,6 +45,18 @@
 
 </details>
 
+<details> <summary>1-2. Step 2 (필수)</summary>
+
+- [x] 할 일 카드 완료/비완료 표시
+  - 할 일 생성 시 기본으로는 `false`로 설정됨
+- [x] 댓글 작성
+  - 연관된 댓글이 존재하는지 확인 필요
+- [x] 댓글 수정 및 삭제
+  - 연관된 댓글이 존재하는지 확인 필요
+  - 작성한 댓글의 작성자/비밀번호와 요청 시 넘겨주는 작성자/비밀번호의 일치 여부 확인 필요
+
+</details>
+
 
 # 2. 고민거리(과제 제출 시 같이 써야 하는 질문들)
 TBD
@@ -60,9 +72,21 @@ erDiagram
         String title
         String content
         String author
-        ZonedDateTime timeCreated
-        ZonedDateTime timeUpdated
+        Boolean isDone
+        ZonedDateTime createdAt
+        ZonedDateTime updatedAt
     }
+    Comment {
+        Long id PK
+        Task task FK
+        String content
+        String author
+        String password
+        ZonedDateTime createdAt
+        ZonedDateTime updatedAt
+    }
+    
+    Task ||--o{ Comment: has
 ```
 
 
@@ -72,18 +96,27 @@ erDiagram
 
 - 4-1-1. 할 일(`task`) 관련
 
-| Feature     |   Method | URL                              | Request                   | Response             |
-|-------------|---------:|----------------------------------|---------------------------|----------------------|
-| 할 일 추가      |   `POST` | `/api/tasks`                     | body: `CreateTaskRequest` | `TaskResponse`       |
-| 할 일 조회 (목록) |    `GET` | `/api/tasks`                     | -                         | `List<TaskResponse>` |
-| 할 일 조회      |    `GET` | `/api/tasks/{taskId}`            | -                         | `TaskResponse`       |
-| 할 일 수정      |    `PUT` | `/api/tasks/{taskId}`            | body: `UpdateTaskRequest` | `TaskResponse`       |
-| 할 일 삭제      | `DELETE` | `/api/tasks/{taskId}`            | -                         | -                    |
+| Feature       |   Method | URL                   | Request                   | Response                     |
+|---------------|---------:|-----------------------|---------------------------|------------------------------|
+| 할 일 추가        |   `POST` | `/api/tasks`          | body: `CreateTaskRequest` | `TaskResponse`               |
+| 할 일 조회 (목록)   |    `GET` | `/api/tasks`          | -                         | `List<TaskDetailedResponse>` |
+| 할 일 조회        |    `GET` | `/api/tasks/{taskId}` | -                         | `TaskResponse`               |
+| 할 일 완료/미완료 표시 |  `PATCH` | `/api/tasks/{taskId}` | -                         | -                            |
+| 할 일 수정        |    `PUT` | `/api/tasks/{taskId}` | body: `UpdateTaskRequest` | `TaskResponse`               |
+| 할 일 삭제        | `DELETE` | `/api/tasks/{taskId}` | -                         | -                            |
 
+- 4-1-2. 댓글(`comment`) 관련
+
+| Feature |   Method | URL                                        | Request                      | Response                  |
+|---------|---------:|--------------------------------------------|------------------------------|---------------------------|
+| 댓글 추가   |   `POST` | `/api/tasks/{taskId}/comments`             | body: `CreateCommentRequest` | `CommentDetailedResponse` |
+| 댓글 수정   |    `PUT` | `/api/tasks/{taskId}/comments/{commentId}` | body: `UpdateCommentRequest` | `CommentDetailedResponse` |
+| 댓글 삭제   | `DELETE` | `/api/tasks/{taskId}/comments/{commentId}` | -                            | -                         |
 
 ## 4-2. API Call에 이용하는 Data Transfer Object (`DTO`)
 
 <details> <summary>4-2-1. 요청(request)</summary>
+
 <details> <summary>4-2-1-1. 할 일(`task`) 관련</summary>
 
 - 4-2-1-1-1. `CreateTaskRequest`
@@ -99,7 +132,7 @@ data class CreateTaskRequest(
 
 - 4-2-1-1-2. `UpdateTaskRequest`
 
-할 일 수정 시(`PATCH /api/tasks`) `body`에 추가하는 내용
+할 일 수정 시(`PUT /api/tasks`) `body`에 추가하는 내용
 ```kotlin
 data class UpdateTaskRequest(
     val title: String,          // 수정할 할 일의 제목
@@ -108,9 +141,37 @@ data class UpdateTaskRequest(
 )
 ```
 </details>
+
+<details> <summary>4-2-1-2. 댓글(`comment`) 관련</summary>
+
+- 4-2-1-1-1. `CreateCommentRequest`
+
+댓글 추가 시(`POST /api/tasks/{taskId}/comments`) `body`에 추가하는 내용
+```kotlin
+data class CreateCommentRequest(
+    val content: String,        // 추가할 댓글의 내용
+    val author: String,         // 추가할 댓글의 작성자
+    val password: String        // 추가할 댓글의 작성자가 설정한 비밀번호
+)
+```
+
+- 4-2-1-1-2. `UpdateTaskRequest`
+
+댓글 수정 시(`PUT /api/tasks/{taskId}/comments/{commentId}`) `body`에 추가하는 내용
+```kotlin
+data class UpdateCommentRequest(
+    val content: String,        // 수정할 댓글의 새 내용
+    val author: String,         // 수정할 댓글의 원 작성자
+    val password: String        // 수정할 댓글의 원 작성자가 설정한 비밀번호
+)
+```
 </details>
 
+</details>
+
+
 <details> <summary>4-2-2. 응답(response)</summary>
+
 <details> <summary>4-2-2-1. 할 일(`task`) 관련</summary>
 
 - 4-2-2-1-1. `TaskResponse`
@@ -129,5 +190,45 @@ data class TaskResponse(
 )
 ```
 
+- 4-2-2-1-2. `TaskDetailedResponse`
+
+할 일(`task`) 상세 조회 시 서버에서 보내는 응답(관련된 댓글(`comment`)들을 포함함)
+```kotlin
+data class TaskDetailedResponse(
+    val task: TaskResponse,             // 할 일
+    val comments: List<CommentResponse> // 할 일과 연관된 댓글들
+)
+```
+
 </details>
+
+<details> <summary>4-2-2-2. 댓글(`comment`) 관련</summary>
+
+- 4-2-2-1-1. `CommentResponse`
+
+단일 할 일(`task`)에 대해 상세 조회를 진행할 때 연관된 댓글 목록으로 댓글 `entity` 대신 보내는 응답
+```kotlin
+import java.time.ZonedDateTime
+
+data class CommentResponse(
+    val id: Long,                       // 댓글의 ID
+    val content: String,                // 댓글의 내용
+    val author: String,                 // 댓글의 작성자
+    val createdAt: ZonedDateTime,       // 댓글의 생성 시각
+    val updatedAt: ZonedDateTime,       // 댓글의 마지막 수정 시각
+)
+```
+
+- 4-2-2-1-2. `TaskDetailedResponse`
+
+댓글(`comment`) 생성 및 수정 시 서버에서 보내는 응답(연관된 할 일(`task`)을 포함함)
+```kotlin
+data class CommentDetailedResponse(
+    val comment: CommentResponse,       // 댓글
+    val taskRelated: TaskResponse       // 댓글이 달린 할 일
+)
+```
+
+</details>
+
 </details>
